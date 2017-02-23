@@ -8,6 +8,7 @@ class glb:
     alock = thread.allocate_lock()
 
 
+# TODO maybe take a start index (line) in the global array for the chunk that is taken #
 def count_bytes(chunk):
     ctr = 0
     for l in chunk:
@@ -23,6 +24,7 @@ def count_bytes(chunk):
     glb.rlock.release()
 
 
+# TODO (maybe hacky?) preprocess the amount of lines in each chunk (by searching for '/n' character) and set that in the global to be used later by each thread #
 def linelengths(filenm, ntrh):
     f = open(filenm, 'rb')
     chunk = os.path.getsize(filenm) / ntrh
