@@ -21,6 +21,12 @@ def count_bytes(chunk, n_newline):
             nl_ctr += 1
         else:
             ctr += 1
+    # Flush remaining of chunk if there is any
+    if ctr != 0:
+        glb.alock.acquire()
+        glb.lst[n_newline + nl_ctr] += ctr
+        glb.alock.release()
+
     glb.rlock.acquire()
     glb.running -= 1
     glb.rlock.release()
@@ -38,17 +44,19 @@ def linelengths(filenm, ntrh):
     glb.running = ntrh
     n_newline = 0
 
-    for t in range(ntrh):
-        if t == 0:
-            min_idx = 0
-            max_idx = 6
-        else:
-            min_idx = 6
-            max_idx = 15
-        thd_read = f_contents[min_idx:max_idx]
+    # Initial range
+    min_idx = 0
+    max_idx = chunk - 1
 
+    for t in range(ntrh):
+        thd_read = f_contents[min_idx:max_idx]
         thread.start_new_thread(count_bytes, (thd_read, n_newline,))
+
+        # Number of newlines to skip when writing to glb.lst
         n_newline += thd_read.count('\n')
+        # Set index for next interation
+        min_idx = max_idx
+        max_idx += (chunk + 1)
 
     while glb.running > 0: pass
 
