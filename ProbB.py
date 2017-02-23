@@ -24,10 +24,13 @@ def count_bytes(chunk):
 
 
 def linelengths(filenm, ntrh):
-    lst = [] f = open(filenm, 'rb')
-    size = os.path.getsize(filenm)
-    chunk = size / ntrh
+    f = open(filenm, 'rb')
+    chunk = os.path.getsize(filenm) / ntrh
     f_contents = f.read()
+    n_lines = f_contents.count('\n')
+    for i in range(n_lines):
+        glb.lst.append(0)
+
     glb.running = ntrh
 
     for t in range(ntrh):
